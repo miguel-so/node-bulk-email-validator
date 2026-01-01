@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Validator - Analytics</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    /* Upload Area */
+    .upload-section {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #drop-zone {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 60px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #fafafa;
+    }
+
+    #drop-zone:hover {
+      border-color: #007aff;
+      background: #f0f7ff;
+    }
+
+    #drop-zone.dragover {
+      border-color: #007aff;
+      background: #e6f2ff;
+    }
+
+    #drop-zone p {
+      color: #666;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    #drop-zone .icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    /* Analytics Cards */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .analytics-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .analytics-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .card-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .card-percent {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .card-icon {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .icon-total {
+      background: #e3f2fd;
+    }
+
+    .icon-total::before {
+      content: '✓';
+      color: #2196f3;
+      font-weight: bold;
+    }
+
+    .icon-valid {
+      background: #e8f5e9;
+    }
+
+    .icon-valid::before {
+      content: '✓';
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    .icon-invalid {
+      background: #ffebee;
+    }
+
+    .icon-invalid::before {
+      content: '✕';
+      color: #f44336;
+      font-weight: bold;
+    }
+
+    .icon-risky {
+      background: #fff3e0;
+    }
+
+    .icon-risky::before {
+      content: '⚠';
+      color: #ff9800;
+      font-weight: bold;
+    }
+
+    .export-btn {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s ease;
+      width: 100%;
+    }
+
+    .export-btn:hover {
+      background: #0056b3;
+    }
+
+    .export-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Progress Section */
+    .progress-section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 40px;
+      display: none;
+    }
+
+    .progress-section.active {
+      display: block;
+    }
+
+    .progress-bar-container {
+      background: #eee;
+      border-radius: 10px;
+      height: 20px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .progress-bar {
+      background: #4caf50;
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .progress-text {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+
+    .cancel-btn {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .cancel-btn:hover {
+      background: #d32f2f;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Analytics</h1>
+    <p class="subtitle">Monitor your email verification usage and performances</p>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+      <div id="drop-zone">
+        <div class="icon">📁</div>
+        <p><strong>Drag and drop your CSV file here</strong></p>
+        <p>or click to browse</p>
+      </div>
+      <input type="file" id="file-input" accept=".csv">
+    </div>
+
+    <!-- Progress Section -->
+    <div class="progress-section" id="progress-section">
+      <div class="progress-text" id="progress-text">Starting...</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <button class="cancel-btn" id="cancel-btn">Cancel</button>
+    </div>
+
+    <!-- Analytics Cards -->
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <div class="card-title">Total Verifications</div>
+        <div class="card-value" id="total-value">0</div>
+        <div class="card-icon icon-total"></div>
+      </div>
+
+      <div class="analytics-card">
+        <div class="card-title">Valid Emails</div>
+        <div class="card-value" id="valid-value">0</div>
+        <div class="card-percent" id="valid-percent">0% of total</div>
+        <div class="card-icon icon-valid"></div>
+        <button class="export-btn" id="export-valid" disabled>Export as CSV</button>
+      </div>
+
+      <div class="analytics-card">
+        <div class="card-title">Invalid Emails</div>
+        <div class="card-value" id="invalid-value">0</div>
+        <div class="card-percent" id="invalid-percent">0% of total</div>
+        <div class="card-icon icon-invalid"></div>
+        <button class="export-btn" id="export-invalid" disabled>Export as CSV</button>
+      </div>
+
+      <div class="analytics-card">
+        <div class="card-title">Risky Emails</div>
+        <div class="card-value" id="risky-value">0</div>
+        <div class="card-percent" id="risky-percent">0% of total</div>
+        <div class="card-icon icon-risky"></div>
+        <button class="export-btn" id="export-risky" disabled>Export as CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const progressSection = document.getElementById('progress-section');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    let currentJobId = null;
+    let progressInterval = null;
+    let analyticsInterval = null;
+
+    // Drag and drop handlers
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.name.endsWith('.csv')) {
+        handleFile(file);
+      } else {
+        alert('Please upload a CSV file');
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleFile(file);
+      }
+    });
+
+    // Handle file upload
+    async function handleFile(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('/api/verify', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const data = await response.json();
+        currentJobId = data.jobId;
+        
+        // Show progress section
+        progressSection.classList.add('active');
+        
+        // Start polling for progress
+        startProgressPolling();
+        startAnalyticsPolling();
+      } catch (error) {
+        alert('Error uploading file: ' + error.message);
+      }
+    }
+
+    // Poll for progress
+    function startProgressPolling() {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+
+      progressInterval = setInterval(async () => {
+        if (!currentJobId) return;
+
+        try {
+          const response = await fetch(`/api/progress/${currentJobId}`);
+          const data = await response.json();
+
+          progressBar.style.width = `${data.progress}%`;
+          progressText.textContent = `${data.progress}% done – Row ${data.row} of ${data.total}`;
+
+          if (data.status === 'completed' || data.progress >= 100) {
+            clearInterval(progressInterval);
+            progressSection.classList.remove('active');
+            // Final analytics update
+            updateAnalytics();
+          } else if (data.status === 'cancelled') {
+            clearInterval(progressInterval);
+            progressSection.classList.remove('active');
+          }
+        } catch (error) {
+          console.error('Error fetching progress:', error);
+        }
+      }, 1000);
+    }
+
+    // Poll for analytics
+    function startAnalyticsPolling() {
+      if (analyticsInterval) {
+        clearInterval(analyticsInterval);
+      }
+
+      analyticsInterval = setInterval(async () => {
+        if (!currentJobId) return;
+
+        try {
+          await updateAnalytics();
+          
+          const response = await fetch(`/api/progress/${currentJobId}`);
+          const data = await response.json();
+          
+          if (data.status === 'completed' || data.progress >= 100) {
+            clearInterval(analyticsInterval);
+          }
+        } catch (error) {
+          console.error('Error fetching analytics:', error);
+        }
+      }, 2000);
+    }
+
+    // Update analytics display
+    async function updateAnalytics() {
+      if (!currentJobId) return;
+
+      try {
+        const response = await fetch(`/api/analytics/${currentJobId}`);
+        const data = await response.json();
+
+        document.getElementById('total-value').textContent = data.total || 0;
+        document.getElementById('valid-value').textContent = data.valid || 0;
+        document.getElementById('invalid-value').textContent = data.invalid || 0;
+        document.getElementById('risky-value').textContent = data.risky || 0;
+
+        document.getElementById('valid-percent').textContent = `${data.validPercent || 0}% of total`;
+        document.getElementById('invalid-percent').textContent = `${data.invalidPercent || 0}% of total`;
+        document.getElementById('risky-percent').textContent = `${data.riskyPercent || 0}% of total`;
+
+        // Enable export buttons if there's data
+        const hasData = data.total > 0;
+        document.getElementById('export-valid').disabled = !hasData || data.valid === 0;
+        document.getElementById('export-invalid').disabled = !hasData || data.invalid === 0;
+        document.getElementById('export-risky').disabled = !hasData || data.risky === 0;
+      } catch (error) {
+        console.error('Error updating analytics:', error);
+      }
+    }
+
+    // Export handlers
+    document.getElementById('export-valid').addEventListener('click', () => {
+      if (currentJobId) {
+        window.open(`/api/download/${currentJobId}?type=valid`, '_blank');
+      }
+    });
+
+    document.getElementById('export-invalid').addEventListener('click', () => {
+      if (currentJobId) {
+        window.open(`/api/download/${currentJobId}?type=invalid`, '_blank');
+      }
+    });
+
+    document.getElementById('export-risky').addEventListener('click', () => {
+      if (currentJobId) {
+        window.open(`/api/download/${currentJobId}?type=risky`, '_blank');
+      }
+    });
+
+    // Cancel handler
+    cancelBtn.addEventListener('click', async () => {
+      if (currentJobId) {
+        try {
+          await fetch(`/api/cancel/${currentJobId}`, { method: 'POST' });
+          if (progressInterval) clearInterval(progressInterval);
+          if (analyticsInterval) clearInterval(analyticsInterval);
+          progressSection.classList.remove('active');
+        } catch (error) {
+          console.error('Error cancelling job:', error);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

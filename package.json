@@ -1,0 +1,26 @@
+{
+  "name": "email-validator",
+  "version": "1.0.0",
+  "description": "Web-based email validator with CSV upload and analytics",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["email", "validator", "csv"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "dns": "^0.2.2",
+    "nodemailer": "^6.9.7",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+
